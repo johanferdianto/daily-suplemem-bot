@@ -51,7 +51,7 @@ for key, val in row.items():
 
 # Ambil token dan chat_id
 BOT_TOKEN = os.environ['BOT_TOKEN']
-CHAT_ID = os.environ['CHAT_ID']
+CHAT_ID = 7859319589
 
 # Debug log
 print("📦 BOT_TOKEN (first 10):", BOT_TOKEN[:10] + "...")

@@ -16,7 +16,10 @@ scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/au
 # 🔑 File kredensial yang kamu simpan di repo
 
 # Simpan secret ke file temporary
-json_data = os.environ['GOOGLE_CREDENTIALS_JSON']
+import base64
+
+base64_creds = os.environ['GOOGLE_CREDENTIALS_B64']
+json_data = base64.b64decode(base64_creds).decode('utf-8')
 with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp_json:
     temp_json.write(json_data)
     temp_json_path = temp_json.name

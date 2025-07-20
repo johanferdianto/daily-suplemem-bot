@@ -61,7 +61,7 @@ print("📨 PESAN:\n", pesan)
 # Kirim ke Telegram
 res = requests.post(
     f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-    data={"chat_id": CHAT_ID, "text": pesan}
+    data={"chat_id": "7859319589", "text": pesan}
 )
 
 print("🧾 RESPONSE:", res.status_code, res.text)

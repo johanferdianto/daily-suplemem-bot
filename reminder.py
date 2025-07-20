@@ -31,12 +31,12 @@ map_hari = {
 hari_eng = datetime.now().strftime('%A')
 hari_ini = map_hari.get(hari_eng, hari_eng)
 
-# --- Ambil semua data dan filter ---
-rows = sheet.get_all_records()
-filtered = [r for r in rows if r['Hari'].strip().lower() == hari_ini.lower()]
+# 🔍 Ambil konten berdasarkan hari
+data = sheet.get_all_records()
+row = next((r for r in data if r.get('Hari', '').strip().lower() == hari_ini.lower()), None)
 
-if not filtered:
-    print(f"❌ Tidak ada entri untuk hari: {hari_ini}")
+if not row or 'Konten' not in row or not row['Konten']:
+    print(f"❌ Tidak ditemukan konten untuk hari: {hari_ini}")
     exit(1)
 
 pesan = row['Konten']

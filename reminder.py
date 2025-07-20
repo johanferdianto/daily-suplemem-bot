@@ -2,10 +2,12 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import datetime
 import requests
+import os
+import requests
 
 # Token & Chat ID
-TOKEN = '8146901711:AAHoLFYmLyOURrR4FooBBO--NIWVpN4w_7E'
-CHAT_ID = '7859319589'
+TOKEN = os.environ['BOT_TOKEN']
+CHAT_ID = os.environ['CHAT_ID']
 
 # Autentikasi Google Sheets API
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]

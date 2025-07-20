@@ -23,19 +23,36 @@ client = gspread.authorize(creds)
 spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1qKWUIB9QcJ2Yh-B5ciTxiDRWdBcpKcEGO2cNFf2zsro")
 sheet = spreadsheet.worksheet("Jadwal")
 
-hari_ini = datetime.now().strftime('%A')
-data = sheet.get_all_records()
+# Mapping hari Inggris ke Indonesia
+english_to_indo = {
+    "Monday": "Senin",
+    "Tuesday": "Selasa",
+    "Wednesday": "Rabu",
+    "Thursday": "Kamis",
+    "Friday": "Jumat",
+    "Saturday": "Sabtu",
+    "Sunday": "Minggu"
+}
 
-row = next((row for row in data if row['Hari'].lower() == hari_ini.lower()), None)
+hari_eng = datetime.now().strftime('%A')
+hari_ini = english_to_indo.get(hari_eng, hari_eng)
+
+data = sheet.get_all_records()
+row = next((row for row in data if row['Hari'].strip().lower() == hari_ini.lower()), None)
 
 if not row:
     print("❌ Hari tidak ditemukan dalam Sheet.")
     exit(1)
 
+# Format pesan
 pesan = f"🧠 Suplemen Hari {hari_ini}:\n\n"
 for key, val in row.items():
-    if key != 'Hari' and val:
+    if key.lower() != 'hari' and val:
         pesan += f"• {key}: {val}\n"
 
+# Kirim ke Telegram
 BOT_TOKEN = os.environ['BOT_TOKEN']
-CHAT_ID = os.environ_
+CHAT_ID = os.environ['CHAT_ID']
+url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+res = requests.post(url, data={"chat_id": CHAT_ID, "text": pesan})
+print("✅ Reminder dikirim:", res.status_code)

@@ -1,74 +1,53 @@
 import os
 import gspread
+import base64
+import tempfile
 from oauth2client.service_account import ServiceAccountCredentials
 import requests
-import datetime
-import json
-import tempfile
+from datetime import datetime
 
-# 🔐 Ambil dari GitHub Secrets
-TOKEN = os.environ['BOT_TOKEN']
-CHAT_ID = os.environ['CHAT_ID']
-
-# 📗 Scope akses Google Sheets API
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-
-# 🔑 File kredensial yang kamu simpan di repo
-
-# Simpan secret ke file temporary
-import base64
-
+# Decode credentials dari base64
 base64_creds = os.environ['GOOGLE_CREDENTIALS_B64']
 json_data = base64.b64decode(base64_creds).decode('utf-8')
-with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp_json:
-    temp_json.write(json_data)
-    temp_json_path = temp_json.name
 
-# Pakai path sementara ini untuk autentikasi
+# Simpan sementara ke file
+with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp:
+    temp.write(json_data)
+    temp_json_path = temp.name
+
+# Setup Google Sheets client
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name(temp_json_path, scope)
-
 client = gspread.authorize(creds)
 
-# 📄 URL spreadsheet kamu (share ke service account!)
 spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1qKWUIB9QcJ2Yh-B5ciTxiDRWdBcpKcEGO2cNFf2zsro")
 sheet = spreadsheet.worksheet("Jadwal")
 
-# 🕒 Ambil hari ini
-hari_map = {
-    'Monday': 'Senin',
-    'Tuesday': 'Selasa',
-    'Wednesday': 'Rabu',
-    'Thursday': 'Kamis',
-    'Friday': 'Jumat',
-    'Saturday': 'Sabtu',
-    'Sunday': 'Minggu'
-}
-today = datetime.datetime.utcnow().strftime('%A')
-hari_ini = hari_map[today]
-
-# 📊 Baca semua data jadwal
+# Ambil baris berdasarkan hari
+hari_ini = datetime.now().strftime('%A')
 data = sheet.get_all_records()
-row = next((x for x in data if x['Hari'] == hari_ini), None)
 
-if row:
-    rotasi = row.get('Rotasi', '-')
-    deskripsi = row.get('Deskripsi', '-')
-    suplemen = row.get('Daftar Suplemen', '')
+row = next((row for row in data if row['Hari'].lower() == hari_ini.lower()), None)
 
-    pesan = f"📅 *Jadwal Suplemen Hari Ini* ({hari_ini})\n\n"
-    pesan += f"🔁 *Rotasi:* {rotasi}\n"
-    pesan += f"🎯 *Fokus:* {deskripsi}"
-    if suplemen:
-        pesan += f"\n💊 *Suplemen:* {suplemen}"
+if not row:
+    print("❌ Hari tidak ditemukan dalam Sheet.")
+    exit(1)
 
-    # 🚀 Kirim ke Telegram
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    requests.post(url, data={
-        "chat_id": CHAT_ID,
-        "text": pesan,
-        "parse_mode": "Markdown"
-    })
+# Buat isi pesan
+pesan = f"🧠 Suplemen Hari {hari_ini}:\n\n"
+for key, val in row.items():
+    if key != 'Hari' and val:
+        pesan += f"• {key}: {val}\n"
 
-    print("✅ Reminder dikirim")
+# Kirim ke Telegram
+BOT_TOKEN = os.environ['BOT_TOKEN']
+CHAT_ID = os.environ['CHAT_ID']
+url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+payload = {'chat_id': CHAT_ID, 'text': pesan}
+
+r = requests.post(url, data=payload)
+
+if r.status_code == 200:
+    print("✅ Reminder dikirim: 200")
 else:
-    print("❌ Hari tidak ditemukan dalam sheet.")
+    print(f"❌ Gagal kirim: {r.status_code} - {r.text}")

@@ -40,7 +40,7 @@ for key, val in row.items():
     if key != 'Hari' and val:
         pesan += f"• {key}: {val}\n"
 
-# 🔐 Ambil token & chat ID dari environment
+# ✅ Ambil dari environment setelah semua definisi
 BOT_TOKEN = os.environ['BOT_TOKEN']
 CHAT_ID = os.environ['CHAT_ID']
 

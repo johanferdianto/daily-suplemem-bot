@@ -2,15 +2,8 @@ name: Daily Supplement Reminder
 
 on:
   schedule:
-    - cron: '0 20 * * *'  # 03:00 WIB (hari sebelumnya UTC)
-    - cron: '0 23 * * *'  # 06:00 WIB
-    - cron: '0 2  * * *'  # 09:00 WIB
-    - cron: '0 5  * * *'  # 12:00 WIB
-    - cron: '0 8  * * *'  # 15:00 WIB
-    - cron: '0 11 * * *'  # 18:00 WIB
-    - cron: '0 14 * * *'  # 21:00 WIB
+    - cron: '0 18 * * *'  # 01:00 WIB
   workflow_dispatch:
-
 
 jobs:
   run-reminder:

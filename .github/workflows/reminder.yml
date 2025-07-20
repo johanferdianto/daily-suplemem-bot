@@ -2,7 +2,7 @@ name: Daily Supplement Reminder
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 07:00 WIB setiap hari
+    - cron: '30 8 * * *'  # Artinya: setiap hari jam 08:30 UTC (≃ 15:30 WIB)
   workflow_dispatch:
 
 jobs:

@@ -6,7 +6,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import requests
 from datetime import datetime
 
-# Decode kredensial dari environment
+# --- Load Google Credentials dari ENV ---
 base64_creds = os.environ['GOOGLE_CREDENTIALS_B64']
 json_data = base64.b64decode(base64_creds).decode('utf-8')
 
@@ -14,7 +14,7 @@ with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp:
     temp.write(json_data)
     temp_json_path = temp.name
 
-# Setup Google Sheets
+# --- Setup koneksi Google Sheets ---
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name(temp_json_path, scope)
 client = gspread.authorize(creds)
@@ -22,40 +22,35 @@ client = gspread.authorize(creds)
 spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1qKWUIB9QcJ2Yh-B5ciTxiDRWdBcpKcEGO2cNFf2zsro")
 sheet = spreadsheet.worksheet("Jadwal")
 
-# 🔁 Mapping English -> Indonesia
+# Mapping hari Inggris ke Indonesia
 map_hari = {
-    "Monday": "Senin",
-    "Tuesday": "Selasa",
-    "Wednesday": "Rabu",
-    "Thursday": "Kamis",
-    "Friday": "Jumat",
-    "Saturday": "Sabtu",
-    "Sunday": "Minggu"
+    "Monday": "Senin", "Tuesday": "Selasa", "Wednesday": "Rabu",
+    "Thursday": "Kamis", "Friday": "Jumat", "Saturday": "Sabtu", "Sunday": "Minggu"
 }
 
-# Ambil hari sekarang dan terjemahkan
-hari_eng = datetime.now().strftime('%A')  # e.g., 'Friday'
-hari_ini = map_hari[hari_eng]
+hari_eng = datetime.now().strftime('%A')
+hari_ini = map_hari.get(hari_eng, hari_eng)
 
-data = sheet.get_all_records()
-row = next((r for r in data if r['Hari'].lower() == hari_ini.lower()), None)
+# --- Ambil semua data dan filter ---
+rows = sheet.get_all_records()
+filtered = [r for r in rows if r['Hari'].strip().lower() == hari_ini.lower()]
 
-if not row:
-    print("❌ Hari tidak ditemukan dalam Sheet.")
+if not filtered:
+    print(f"❌ Tidak ada entri untuk hari: {hari_ini}")
     exit(1)
 
-# --- Bangun pesan Telegram ---
+# --- Buat pesan Telegram ---
 judul = filtered[0].get('Judul', '')
 deskripsi = filtered[0].get('Deskripsi', '')
 pesan = f"{judul}\n{deskripsi}\n"
 
 for r in filtered:
     waktu = r.get('Waktu', '').strip()
-    suplemen = r.get('Dosis', '').strip()
-    tujuan = r.get('Goal', '').strip()
+    dosis = r.get('Dosis', '').strip()
+    goal = r.get('Goal', '').strip()
 
-    if waktu and suplemen:
-        pesan += f"\n🕒 {waktu}\n{suplement}\n🎯 {tujuan}\n"
+    if waktu and dosis:
+        pesan += f"\n🕒 {waktu}\n{dosis}\n🎯 {goal}"
 
 # Ambil token dan chat_id
 BOT_TOKEN = os.environ['BOT_TOKEN']

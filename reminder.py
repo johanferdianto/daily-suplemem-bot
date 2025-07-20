@@ -39,18 +39,7 @@ if not filtered:
     print(f"❌ Tidak ada entri untuk hari: {hari_ini}")
     exit(1)
 
-# --- Buat pesan Telegram ---
-judul = filtered[0].get('Judul', '')
-deskripsi = filtered[0].get('Deskripsi', '')
-pesan = f"{judul}\n{deskripsi}\n"
-
-for r in filtered:
-    waktu = r.get('Waktu', '').strip()
-    dosis = r.get('Dosis', '').strip()
-    goal = r.get('Goal', '').strip()
-
-    if waktu and dosis:
-        pesan += f"\n🕒 {waktu}\n{dosis}\n🎯 {goal}"
+pesan = row['Konten']
 
 # Ambil token dan chat_id
 BOT_TOKEN = os.environ['BOT_TOKEN']

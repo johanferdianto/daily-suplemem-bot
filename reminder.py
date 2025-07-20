@@ -44,6 +44,10 @@ if not row:
     print("❌ Hari tidak ditemukan dalam Sheet.")
     exit(1)
 
+print("📦 TOKEN:", repr(BOT_TOKEN))
+print("📦 CHAT_ID:", repr(CHAT_ID))
+print("📨 PESAN:", pesan)
+
 # Format pesan
 pesan = f"🧠 Suplemen Hari {hari_ini}:\n\n"
 for key, val in row.items():
@@ -56,3 +60,11 @@ CHAT_ID = os.environ['CHAT_ID']
 url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 res = requests.post(url, data={"chat_id": CHAT_ID, "text": pesan})
 print("✅ Reminder dikirim:", res.status_code)
+
+response = requests.post(
+    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+    data={"chat_id": CHAT_ID, "text": pesan}
+)
+
+print("🧾 RESPONSE:", response.status_code, response.text)
+

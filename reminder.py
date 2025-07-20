@@ -3,6 +3,8 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import requests
 import datetime
+import json
+import tempfile
 
 # 🔐 Ambil dari GitHub Secrets
 TOKEN = os.environ['BOT_TOKEN']
@@ -12,7 +14,16 @@ CHAT_ID = os.environ['CHAT_ID']
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
 # 🔑 File kredensial yang kamu simpan di repo
-creds = ServiceAccountCredentials.from_json_keyfile_name('dailysuplemen-f678a059f076.json', scope)
+
+# Simpan secret ke file temporary
+json_data = os.environ['GOOGLE_CREDENTIALS_JSON']
+with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp_json:
+    temp_json.write(json_data)
+    temp_json_path = temp_json.name
+
+# Pakai path sementara ini untuk autentikasi
+creds = ServiceAccountCredentials.from_json_keyfile_name(temp_json_path, scope)
+
 client = gspread.authorize(creds)
 
 # 📄 URL spreadsheet kamu (share ke service account!)

@@ -44,10 +44,18 @@ if not row:
     print("❌ Hari tidak ditemukan dalam Sheet.")
     exit(1)
 
-pesan = f"🧠 Suplemen Hari {hari_ini}:\n\n"
-for key, val in row.items():
-    if key != 'Hari' and val:
-        pesan += f"• {key}: {val}\n"
+# --- Bangun pesan Telegram ---
+judul = filtered[0].get('Judul', '')
+deskripsi = filtered[0].get('Deskripsi', '')
+pesan = f"{judul}\n{deskripsi}\n"
+
+for r in filtered:
+    waktu = r.get('Waktu', '').strip()
+    suplemen = r.get('Dosis', '').strip()
+    tujuan = r.get('Goal', '').strip()
+
+    if waktu and suplemen:
+        pesan += f"\n🕒 {waktu}\n{suplement}\n🎯 {tujuan}\n"
 
 # Ambil token dan chat_id
 BOT_TOKEN = os.environ['BOT_TOKEN']

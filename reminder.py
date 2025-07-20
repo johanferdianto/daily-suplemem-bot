@@ -20,7 +20,7 @@ creds = ServiceAccountCredentials.from_json_keyfile_name(temp_json_path, scope)
 client = gspread.authorize(creds)
 
 spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1qKWUIB9QcJ2Yh-B5ciTxiDRWdBcpKcEGO2cNFf2zsro")
-sheet = spreadsheet.worksheet("Jadwal-Autophagy")
+sheet = spreadsheet.worksheet("Jadwal-Full")
 
 # Mapping hari Inggris ke Indonesia
 map_hari = {

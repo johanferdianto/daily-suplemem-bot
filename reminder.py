@@ -22,7 +22,21 @@ client = gspread.authorize(creds)
 spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1qKWUIB9QcJ2Yh-B5ciTxiDRWdBcpKcEGO2cNFf2zsro")
 sheet = spreadsheet.worksheet("Jadwal")
 
-hari_ini = datetime.now().strftime('%A')
+# 🔁 Mapping English -> Indonesia
+map_hari = {
+    "Monday": "Senin",
+    "Tuesday": "Selasa",
+    "Wednesday": "Rabu",
+    "Thursday": "Kamis",
+    "Friday": "Jumat",
+    "Saturday": "Sabtu",
+    "Sunday": "Minggu"
+}
+
+# Ambil hari sekarang dan terjemahkan
+hari_eng = datetime.now().strftime('%A')  # e.g., 'Friday'
+hari_ini = map_hari[hari_eng]
+
 data = sheet.get_all_records()
 row = next((r for r in data if r['Hari'].lower() == hari_ini.lower()), None)
 

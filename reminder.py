@@ -26,7 +26,7 @@ map_hari = {
     "Monday": "Senin", "Tuesday": "Selasa", "Wednesday": "Rabu",
     "Thursday": "Kamis", "Friday": "Jumat", "Saturday": "Sabtu", "Sunday": "Minggu"
 }
-hari_eng = datetime.now().strftime('%A')
+hari_eng = datetime.now(ZoneInfo("Asia/Jakarta")).strftime('%A')
 hari_ini = map_hari[hari_eng]
 
 # ========== 💬 Fungsi Kirim ==========
